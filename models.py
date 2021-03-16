@@ -21,18 +21,14 @@ class User(db.Model):
     Last_name = db.Column(db.String(30), nullable=False)
 
     @classmethod
-    def register(cls, username, password, first_name, last_name, email):
-        """Register a user, hashing their password."""
+    def register(cls, username, password, email, first_name, last_name):
+        """Register a user!"""
 
         hashed = bcrypt.generate_password_hash(password)
-        hashed_utf8 = hashed.decode("utf8")
-        user = cls(
-            username=username,
-            password=hashed_utf8,
-            first_name=first_name,
-            last_name=last_name,
-            email=email
-        )
+        hashed_password = hashed.decode("utf8")
+
+        user = cls(username=username, password=hashed_password,
+                   first_name=first_name, last_name=last_name, email=email)
 
         db.session.add(user)
         return user

@@ -23,7 +23,7 @@ def home():
     return redirect("/register")
 
 
-@app.route('/register', methods=['GET', 'POST'])
+@app.route('/register', methods=["GET", "POST"])
 def register():
     """Produce a form to register a user and handle form submission"""
     
@@ -40,3 +40,21 @@ def register():
 
         return redirect(f"/users/{user.username}")
 
+    form = RegisterForm()
+
+    if form.validate_on_submit():
+        username = form.username.data
+        password = form.password.data
+        email = form.email.data
+        first_name = form.first_name.data
+        last_name = form.last_name.data
+
+        user = User.register(username, password, email, first_name, last_name)
+        
+        db.session.commit()
+        session['username'] = user.username
+
+        return redirect(f"/users/{user.username}")
+
+    else:
+        return render_template("users.register.html", form=form)
