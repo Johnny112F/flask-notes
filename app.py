@@ -20,3 +20,13 @@ def home():
     """Direct user to home page of the site, then redirect for registration"""
 
     return redirect("/register")
+
+@app.route('/register')
+def register():
+    """Register a user: produce a form and handle form submission"""
+
+    username = form.username.data
+    password = form.password.data
+    email = form.email.data
+    first_name = form.first_name.data
+    last_name = form.last_name.data
