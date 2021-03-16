@@ -5,7 +5,7 @@ from forms import RegisterForm
 
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = "postgres:///flask_notes"
+app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql:///flask_notes"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = "hello-secrets"
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
@@ -57,4 +57,4 @@ def register():
         return redirect(f"/users/{user.username}")
 
     else:
-        return render_template("users.register.html", form=form)
+        return render_template("register.html", form=form)
