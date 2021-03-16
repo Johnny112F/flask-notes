@@ -1,6 +1,7 @@
 from flask import Flask, render_template, redirect, session
 from flask_debugtoolbar import DebugToolbarExtension
 from models import connect_db, db, User
+from forms import RegisterForm
 
 app = Flask(__name__)
 
@@ -21,12 +22,21 @@ def home():
 
     return redirect("/register")
 
-@app.route('/register')
-def register():
-    """Register a user: produce a form and handle form submission"""
 
-    username = form.username.data
-    password = form.password.data
-    email = form.email.data
-    first_name = form.first_name.data
-    last_name = form.last_name.data
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    """Produce a form to register a user and handle form submission"""
+    
+    form = RegisterForm()
+
+    if form.validate_on_submit():
+        username = form.username.data
+        password = form.password.data
+        first_name = form.first_name.data
+        last_name = form.last_name.data
+        email = form.email.data
+
+        user = User.register(username, password, first_name, last_name, email)
+
+        return redirect(f"/users/{user.username}")
+

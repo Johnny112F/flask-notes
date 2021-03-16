@@ -20,10 +20,26 @@ class User(db.Model):
     first_name = db.Column(db.String(30), nullable=False)
     Last_name = db.Column(db.String(30), nullable=False)
 
+    @classmethod
+    def register(cls, username, password, first_name, last_name, email):
+        """Register a user, hashing their password."""
+
+        hashed = bcrypt.generate_password_hash(password)
+        hashed_utf8 = hashed.decode("utf8")
+        user = cls(
+            username=username,
+            password=hashed_utf8,
+            first_name=first_name,
+            last_name=last_name,
+            email=email
+        )
+
+        db.session.add(user)
+        return user
+
 
 def connect_db(app):
     """Connect database to Flask app."""
 
     db.app = app
     db.init_app(app)
-    
