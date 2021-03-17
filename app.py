@@ -162,11 +162,11 @@ def update_note(note_id):
     return render_template("/notes/edit.html", form=form, feedback=note)
 
 
-@app.route("/notes/<int:id>/delete", methods=["POST"])
-def delete_note(id):
+@app.route("/notes/<int:note_id>/delete", methods=["POST"])
+def delete_note(note_id):
     """Delete note."""
 
-    note = Note.query.get(id)
+    note = Note.query.get(note_id)
     if "username" not in session or note.username != session['username']:
         raise Unauthorized()
 
