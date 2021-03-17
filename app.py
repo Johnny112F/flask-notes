@@ -94,6 +94,9 @@ def logout():
 @app.route("/users/<username>")
 def show_user(username):
     """Show user info when logged in"""
+    if "username" not in session or username != session['username']:
+        raise Unauthorized()
+        return redirect("/register")
 
     user = User.query.get(username)
 
@@ -165,16 +168,13 @@ def update_note(note_id):
 @app.route("/notes/<int:note_id>/delete", methods=["POST"])
 def delete_note(note_id):
     """Delete note."""
-
     note = Note.query.get(note_id)
-    if "username" not in session or note.username != session['username']:
+    if 'username' not in session or note.username != session['username']:
         raise Unauthorized()
 
-    form = DeleteForm()
-
-    if form.validate_on_submit():   # <-- csrf checking!
-        db.session.delete(note)
-        db.session.commit()
+    # form = DeleteForm()
+    # if form.validate_on_submit():   # <-- csrf checking!
+    db.session.delete(note)
+    db.session.commit()
 
     return redirect(f"/users/{note.username}")
-
