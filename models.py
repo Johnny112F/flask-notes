@@ -44,6 +44,20 @@ class User(db.Model):
         return False
 
 
+class Note(db.Model):
+    """ User Notes"""
+
+    __tablename__ = "notes"
+
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(100), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    username = db.Column(db.String(20),
+                         db.ForeignKey('users.username'),
+                         nullable=False
+                         )
+
+
 def connect_db(app):
     """Connect database to Flask app."""
 
