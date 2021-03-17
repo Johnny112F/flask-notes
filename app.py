@@ -44,7 +44,7 @@ def register():
         db.session.commit()
         session['username'] = user.username
 
-        return redirect("/users/secret")
+        return redirect(f"/users/{user.username}")
 
     else:
         return render_template("users/register.html", form=form)
@@ -75,7 +75,7 @@ def login():
         user = User.authenticate(username, password)
         if user:
             session['username'] = user.username
-            return redirect("/secret")
+            return redirect(f"/users/{user.username}")
         form.username.errors = ["Invalid Input. Try Again"]
         return render_template("users/login.html", form=form)
 
@@ -90,4 +90,10 @@ def logout():
     return redirect("/login")
 
 
+@app.route("/users/<username>")
+def show_user(username):
+    """Show user info when logged in"""
 
+    user = User.query.get(username)
+
+    return render_template("users/show.html", user=user)
