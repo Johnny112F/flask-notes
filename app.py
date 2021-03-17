@@ -2,6 +2,7 @@ from flask import Flask, render_template, redirect, session
 from flask_debugtoolbar import DebugToolbarExtension
 from models import connect_db, db, User, Note
 from forms import RegisterForm, LoginForm, NoteForm
+from werkzeug.exceptions import Unauthorized
 
 app = Flask(__name__)
 
@@ -121,3 +122,59 @@ def new_note(username):
 
         return redirect(f"/users/{note.username}")
     return render_template("/notes/new.html", form=form)
+
+
+@app.route("/users/<username>/delete", methods=["POST"])
+def remove_user(username):
+    """Remove user and redirect to login."""
+
+    if "username" not in session or username != session['username']:
+        raise Unauthorized()
+
+    user = User.query.get(username)
+    Note.query.filter_by(username=username).delete()
+    db.session.delete(user)
+    db.session.commit()
+    session.pop("username")
+
+    return redirect("/login")
+
+
+@app.route("/notes/<int:note_id>/update", methods=["GET", "POST"])
+def update_note(note_id):
+    """Show update-note form and process it."""
+
+    note = Note.query.get(note_id)
+
+    if "username" not in session or note.username != session['username']:
+        raise Unauthorized()
+
+    form = NoteForm(obj=note)
+
+    if form.validate_on_submit():
+        note.title = form.title.data
+        note.content = form.content.data
+
+        db.session.commit()
+
+        return redirect(f"/users/{note.username}")
+
+    return render_template("/notes/edit.html", form=form, feedback=note)
+
+
+@app.route("/notes/<int:note_id>/delete", methods=["POST"])
+def delete_note(note_id):
+    """Delete note."""
+
+    note = Note.query.get(note_id)
+    if "username" not in session or note.username != session['username']:
+        raise Unauthorized()
+
+    form = DeleteForm()
+
+    if form.validate_on_submit():   # <-- csrf checking!
+        db.session.delete(note)
+        db.session.commit()
+
+    return redirect(f"/users/{note.username}")
+

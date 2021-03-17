@@ -17,6 +17,20 @@
       <!-- Show note features for user -->
       <ul>
         {% for note in user.notes %}
+        <li>
+        <form class="d-inline mr-2">
+          
+          <button class="btn btn-link text-primary p-0 btn-sm"
+                  formmethod="GET"
+                  formaction="/notes/{{ note.id }}/update">
+            <i class="far fa-edit"></i>
+          </button>
+          <button class="btn btn-link text-danger p-0 btn-sm"
+                  formmethod="POST"
+                  formaction="/notes/{{ note.id }}/delete">
+            <i class="fas fa-trash"></i>
+          </button>
+        </form>
 
             {{ note.title }}
             <small class="ml-2 text-muted">{{ note.content }}</small>
