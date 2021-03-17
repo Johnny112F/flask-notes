@@ -18,20 +18,30 @@ class User(db.Model):
     password = db.Column(db.Text, nullable=False)
     email = db.Column(db.String(50), nullable=False)
     first_name = db.Column(db.String(30), nullable=False)
-    Last_name = db.Column(db.String(30), nullable=False)
+    last_name = db.Column(db.String(30), nullable=False)
 
     @classmethod
     def register(cls, username, password, email, first_name, last_name):
         """Register a user!"""
 
-        hashed = bcrypt.generate_password_hash(password)
-        hashed_password = hashed.decode("utf8")
+        hashed = (bcrypt.generate_password_hash(password)
+                        .decode("utf8"))
 
-        user = cls(username=username, password=hashed_password,
-                   first_name=first_name, last_name=last_name, email=email)
+        user = cls(username=username, password=hashed, email=email,
+                   first_name=first_name, last_name=last_name)
 
         db.session.add(user)
         return user
+    
+    @classmethod
+    def authenticate(cls, username, password):
+        """Check for valid username and password and return user if correct"""
+
+        user = User.query.filter_by(username=username).first()
+
+        if user and bcrypt.check_password_hash(user.password, password):
+            return user
+        return False
 
 
 def connect_db(app):

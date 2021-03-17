@@ -1,7 +1,7 @@
 from flask import Flask, render_template, redirect, session
 from flask_debugtoolbar import DebugToolbarExtension
 from models import connect_db, db, User
-from forms import RegisterForm
+from forms import RegisterForm, LoginForm
 
 app = Flask(__name__)
 
@@ -26,20 +26,10 @@ def home():
 @app.route('/register', methods=["GET", "POST"])
 def register():
     """Produce a form to register a user and handle form submission"""
+
+    if "username" in session:
+        return redirect(f"/users/{session['username']}")
     
-    form = RegisterForm()
-
-    if form.validate_on_submit():
-        username = form.username.data
-        password = form.password.data
-        first_name = form.first_name.data
-        last_name = form.last_name.data
-        email = form.email.data
-
-        user = User.register(username, password, first_name, last_name, email)
-
-        return redirect(f"/users/{user.username}")
-
     form = RegisterForm()
 
     if form.validate_on_submit():
@@ -54,7 +44,50 @@ def register():
         db.session.commit()
         session['username'] = user.username
 
-        return redirect(f"/users/{user.username}")
+        return redirect("/users/secret")
 
     else:
-        return render_template("register.html", form=form)
+        return render_template("users/register.html", form=form)
+
+
+@app.route("/secret")
+def secret():
+    """User is redirected to secret.html upon completing form successfully"""
+    # check for user in session
+    if "username" in session:
+        return render_template("/users/secret.html")
+    else:
+        return "incorrect login"
+
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    """Produce login form and handle login"""
+    if "username" in session:
+        return redirect(f"/users/{session['username']}")
+
+    form = LoginForm()
+
+    if form.validate_on_submit():
+        username = form.username.data
+        password = form.password.data
+
+        user = User.authenticate(username, password)
+        if user:
+            session['username'] = user.username
+            return redirect("/secret")
+        form.username.errors = ["Invalid Input. Try Again"]
+        return render_template("users/login.html", form=form)
+
+    return render_template("users/login.html", form=form)
+
+
+@app.route("/logout")
+def logout():
+    """logout user"""
+
+    session.pop("username")
+    return redirect("/login")
+
+
+
