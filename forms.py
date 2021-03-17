@@ -41,3 +41,7 @@ class NoteForm(FlaskForm):
         validators=[InputRequired()],
         render_kw={'class': 'form-control', 'rows': 10}
     )
+
+
+class DeleteForm(FlaskForm):
+    """Delete form -- this form is intentionally blank."""
