@@ -1,7 +1,7 @@
 from flask import Flask, render_template, redirect, session
 from flask_debugtoolbar import DebugToolbarExtension
-from models import connect_db, db, User
-from forms import RegisterForm, LoginForm
+from models import connect_db, db, User, Note
+from forms import RegisterForm, LoginForm, NoteForm
 
 app = Flask(__name__)
 
@@ -97,3 +97,27 @@ def show_user(username):
     user = User.query.get(username)
 
     return render_template("users/show.html", user=user)
+
+
+@app.route("/users/<username>/notes/new", methods=["GET", "POST"])
+def new_note(username):
+    """Show add-note form and process it"""
+
+    form = NoteForm()
+
+    if form.validate_on_submit():
+        title = form.title.data
+        content = form.content.data
+
+    #make an instance of Note
+        note = Note(
+            title=title,
+            content=content,
+            username=username,
+        )
+
+        db.session.add(note)
+        db.session.commit()
+
+        return redirect(f"/users/{note.username}")
+    return render_template("/notes/new.html", form=form)

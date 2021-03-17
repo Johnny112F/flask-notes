@@ -11,6 +11,34 @@
       <h1>{{ user.first_name }} {{ user.last_name }}</h1>
 
       <p>Email: {{ user.email }}</p>
+
+      <h2 class="mt-4">Notes</h2>
+
+      <!-- Show note features for user -->
+      <ul>
+        {% for note in user.notes %}
+
+            {{ note.title }}
+            <small class="ml-2 text-muted">{{ note.content }}</small>
+          </li>
+
+        {% endfor %}
+      </ul>
+      <!-- add a note for this user -->
+      <p>
+        <a href="/users/{{ user.username }}/notes/new" class="btn btn-primary">
+          Add Note
+        </a>
+      </p>
+      <!-- Delete a user -->
+      <form>
+        <button class="btn btn-danger btn-sm"
+                formaction="/users/{{ user.username }}/delete"
+                formmethod="POST">
+          Delete User
+        </button>
+      </form>
+
     </div>
   </div>
 

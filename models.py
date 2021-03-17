@@ -20,6 +20,8 @@ class User(db.Model):
     first_name = db.Column(db.String(30), nullable=False)
     last_name = db.Column(db.String(30), nullable=False)
 
+    notes = db.relationship("Note", backref="user")
+
     @classmethod
     def register(cls, username, password, email, first_name, last_name):
         """Register a user!"""
